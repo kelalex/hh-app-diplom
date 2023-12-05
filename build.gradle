@@ -1,0 +1,80 @@
+plugins {
+    id 'org.springframework.boot' version '2.2.5.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+    id "com.github.node-gradle.node" version "2.2.0"
+}
+
+group = 'hh-app'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+/*compileJava {
+    options.compilerArgs += ["--enable-preview"]
+}
+test {
+    jvmArgs '--enable-preview'
+}*/
+
+task buildFront(type: YarnTask) {
+    args = ['heroku-postbuild']
+}
+
+yarn_install.dependsOn(yarn_cache_clean)
+buildFront.dependsOn(yarn_install)
+processResources.dependsOn(buildFront)
+
+node {
+    distBaseUrl = 'https://nodejs.org/dist'
+    download = true
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    /*Подключенные*/
+    implementation("com.google.guava:guava:28.2-jre")
+    compile group: 'org.seleniumhq.selenium', name: 'selenium-java'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
+    compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.2.1.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.2.1.RELEASE'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
+    compile group: 'com.opencsv', name: 'opencsv', version: '3.7'
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.1'
+    compile group: 'org.apache.poi', name: 'poi', version: '4.1.1'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.2.3.RELEASE'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.1'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '1.2.0.RELEASE'
+
+
+    /*Базовые*/
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.session:spring-session-jdbc'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'org.springframework.security:spring-security-test'
+}
